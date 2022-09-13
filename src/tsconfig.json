@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "noEmit": true,
+        "target": "ES2020",
+        "module": "ES2020",
+        "moduleResolution": "Node",
+        "experimentalDecorators": true,
+        "jsx": "react",
+        "sourceMap": true,
+
+        "baseUrl": ".",
+        "paths": {
+            "client/*": [ "./*" ],
+            "@ff/core/*": [ "../libs/core/src/*" ],
+            "@ff/browser/*": [ "../libs/browser/src/*" ],
+            "@ff/ui/*": [ "../libs/ui/src/*" ],
+            "@ff/lit/*": [ "../libs/lit/src/*" ],
+        }
+    },
+    "include": [
+        "**/*"
+    ]
+}
