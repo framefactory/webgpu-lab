@@ -10,3 +10,6 @@
 [submodule "libs/lit"]
 	path = libs/lit
 	url = git@github.com:framefactory/ff-lit.git
+[submodule "libs/gpu"]
+	path = libs/gpu
+	url = git@github.com:framefactory/ff-gpu.git
