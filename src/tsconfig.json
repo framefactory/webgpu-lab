@@ -20,6 +20,8 @@
             "@ff/browser/*": [ "../libs/browser/src/*" ],
             "@ff/ui/*": [ "../libs/ui/src/*" ],
             "@ff/lit/*": [ "../libs/lit/src/*" ],
+            "@ff/geo/*": [ "../libs/geo/src/*" ],
+            "@ff/gpu/*": [ "../libs/gpu/src/*" ],
         }
     },
     "include": [

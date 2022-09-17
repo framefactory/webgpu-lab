@@ -30,6 +30,8 @@
     "@framefactory/core": "file:libs/core",
     "@framefactory/lit": "file:libs/lit",
     "@framefactory/ui": "file:libs/ui",
+    "@framefactory/geo": "file:libs/geo",
+    "@framefactory/gpu": "file:libs/gpu",
     "lit": "^2.3.1"
   },
   "devDependencies": {

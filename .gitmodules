@@ -13,3 +13,6 @@
 [submodule "libs/gpu"]
 	path = libs/gpu
 	url = git@github.com:framefactory/ff-gpu.git
+[submodule "libs/geo"]
+	path = libs/geo
+	url = git@github.com:framefactory/ff-geo.git

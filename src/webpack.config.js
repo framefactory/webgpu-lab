@@ -43,6 +43,8 @@ module.exports = utils.createWebpackConfig({
         "@ff/browser": path.resolve(modulesDir, "@framefactory/browser/src"),
         "@ff/ui": path.resolve(modulesDir, "@framefactory/ui/src"),
         "@ff/lit": path.resolve(modulesDir, "@framefactory/lit/src"),
+        "@ff/geo": path.resolve(modulesDir, "@framefactory/geo/src"),
+        "@ff/gpu": path.resolve(modulesDir, "@framefactory/gpu/src"),
     },
 
     // project components to be built
