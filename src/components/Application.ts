@@ -12,13 +12,13 @@ import "@ffweb/lit/Canvas";
 import type { ICanvasMountEvent, ICanvasResizeEvent } from "@ffweb/lit/Canvas.js";
 
 import { Engine } from "../core/Engine.js";
+import { Triangle } from "../experiments/Triangle.js";
 
 @customElement("ff-application")
 export default class Application extends CustomElement
 {
     protected static readonly shady = true;
 
-    protected canvas: HTMLCanvasElement;
     protected engine: Engine;
 
     static styles = css`
@@ -51,23 +51,23 @@ export default class Application extends CustomElement
 
     protected async onMount(event: ICanvasMountEvent)
     {
-        const canvas = this.canvas = event.detail.canvas;
-        console.log(`[Canvas] ${canvas ? "mount" : "unmount"}`);
+        const canvas = event.detail.canvas;
+
+        await this.engine.initialize();
+        this.engine.canvas = canvas;
 
         if (canvas) {
-            await this.engine.initialize(canvas);
-            this.engine.start();
+            this.engine.experiment = new Triangle(this.engine.device);
+            this.engine.start();    
+        }
+        else {
+            this.engine.stop();
         }
     }
 
     protected onResize(event: ICanvasResizeEvent)
     {
-        const { width, height, physicalWidth, physicalHeight } = event.detail;
-        console.log(`[Canvas] resize ${width} x ${height} / ${physicalWidth} x ${physicalHeight}`);
-
-        if (this.canvas) {
-            this.canvas.width = physicalWidth;
-            this.canvas.height = physicalHeight;
-        }
+        const { physicalWidth, physicalHeight } = event.detail;
+        this.engine.resize(physicalWidth, physicalHeight);
     }
 }

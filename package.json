@@ -33,6 +33,7 @@
     "@ffweb/gpu": "workspace:*",
     "@ffweb/lit": "workspace:*",
     "@ffweb/ui": "workspace:*",
+    "gl-matrix": "^3.4.3",
     "lit": "^2.4.0"
   },
   "devDependencies": {

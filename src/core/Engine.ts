@@ -5,129 +5,89 @@
  * License: MIT
  */
 
+import { Pulse, type IPulseState } from "@ffweb/browser/Pulse.js";
+import { Experiment } from "./Experiment.js";
+import { Surface } from "./Surface.js";
+
 export class Engine
 {
-    protected static vertexShaderCode = /* wgsl */`
-        @vertex
+    pulse: Pulse;
+    surface: Surface;
+    device: GPUDevice;
 
-        fn main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32>
-        {
-            var pos = array<vec2<f32>, 3>(
-                vec2<f32>(0.0, 0.5),
-                vec2<f32>(-0.5, -0.5),
-                vec2<f32>(0.5, -0.5)
-            );
-            return vec4<f32>(pos[vertexIndex], 0.0, 1.0);
-        }
-    `;
-
-    protected static fragmentShaderCode = /* wgsl */`
-        @fragment
-
-        fn main() -> @location(0) vec4<f32>
-        {
-            return vec4<f32>(1.0, 0.0, 0.0, 1.0);
-        }
-    `;
-
-    protected canvas: HTMLCanvasElement = null;
-    protected context: GPUCanvasContext = null;
-    protected device: GPUDevice = null;
-    protected pipeline: GPURenderPipeline = null;
+    private _experiment: Experiment = null;
+    private _resizeWidth = 0;
+    private _resizeHeight = 0;
     
     constructor()
     {
-        this.animate = this.animate.bind(this);
+        this.pulse = new Pulse();
+        this.pulse.on("pulse", this.render, this);
     }
 
-    async initialize(canvas: HTMLCanvasElement)
+    set experiment(experiment: Experiment) {
+        this._experiment = experiment;
+        experiment.initialize(this.surface);
+    }
+
+    get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    set canvas(canvas: HTMLCanvasElement) {
+        if (canvas) {
+            this.surface = new Surface(canvas);
+            this.surface.configure(this.device);    
+        }
+        else {
+            this.surface.destroy();
+        }
+    }
+
+    async initialize()
     {
-        console.log("[Engine] initialize");
+        if (this.device) {
+            return;
+        }
 
         const gpu = navigator.gpu;
         const adapter = await gpu.requestAdapter({ powerPreference: "high-performance" });  
-        const presentationFormat = gpu.getPreferredCanvasFormat();
-        const device = this.device = await adapter.requestDevice();
-
-        this.canvas = canvas;
-        const context = this.context = canvas.getContext("webgpu");
-        context.configure({
-            device,
-            format: presentationFormat,
-            alphaMode: "opaque"
-        });
-
-        const vertexShader = this.device.createShaderModule({
-            code: Engine.vertexShaderCode,
-        });
-        const fragmentShader = this.device.createShaderModule({
-            code: Engine.fragmentShaderCode,
-        });
-    
-        this.pipeline = this.device.createRenderPipeline({
-            layout: "auto",
-            vertex: {
-                module: vertexShader,
-                entryPoint: "main"
-            },
-            fragment: {
-                module: fragmentShader,
-                entryPoint: "main",
-                targets: [{
-                    format: presentationFormat
-                }]
-            },
-            primitive: {
-                topology: "triangle-list"
-            },
-        });
+        this.device = this.device = await adapter.requestDevice();
     }
 
     destroy()
     {
         this.device.destroy();
         this.device = null;
-        this.canvas = null;
+        this.surface.destroy();
+        this.surface = null;
     }
 
     start()
     {
-        requestAnimationFrame(this.animate);
+        this.pulse.start();
     }
 
-    animate()
+    stop()
     {
-        requestAnimationFrame(this.animate);
-        this.render();
+        this.pulse.stop();
     }
 
-    render()
+    render(state: IPulseState)
     {
-        if (!this.canvas) {
-            return;
+        if (this._resizeWidth > 0 && this._resizeHeight > 0) {
+            this.surface.resize(this._resizeWidth, this._resizeHeight);
+            this.experiment?.resize(this._resizeWidth, this._resizeHeight);
+            this._resizeWidth = 0;
+            this._resizeHeight = 0;
         }
 
-        const encoder = this.device.createCommandEncoder();
-        const texture = this.context.getCurrentTexture();
-        console.log(texture.width, texture.height);
-        const view = texture.createView();
-
-        const pass = encoder.beginRenderPass({
-            colorAttachments: [{
-                view,
-                clearValue: { r: 0, g: 0, b: 0, a: 1 },
-                loadOp: "clear",
-                storeOp: "store"
-            }],
-        });
-        pass.setPipeline(this.pipeline);
-        pass.draw(3, 1, 0, 0);
-        pass.end();
-
-        this.device.queue.submit([ encoder.finish() ]);
+        this._experiment?.render(this.surface, state);
     }
 
     resize(width: number, height: number)
     {
+        this._resizeWidth = Math.floor(width);
+        this._resizeHeight = Math.floor(height);
     }
 }
