@@ -8,6 +8,9 @@
 
 "use strict";
 
+import * as dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
+
 import * as path from "path";
 import * as utils from "./webpack.utils.js"
 
