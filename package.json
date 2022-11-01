@@ -1,18 +1,9 @@
 {
-  "name": "frontend-template",
-  "version": "1.3.2",
-  "description": "Font-end development with Typescript, Web Components, SCSS.",
-  "main": "index.js",
-  "scripts": {
-    "build": "npm run build:prod",
-    "build:dev": "cd src; NODE_ENV=development webpack --mode=development --env component=all",
-    "build:prod": "cd src; NODE_ENV=production webpack --mode=production --env component=all",
-    "dev": "cd src; NODE_ENV=development webpack serve --mode=development --env component=default"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/framefactory/frontend-template.git"
-  },
+  "name": "webgpu-lab",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "WebGPU experiments",
+  "homepage": "https://github.com/framefactory/webgpu-lab#readme",
   "contributors": [
     {
       "name": "Ralph Wiedemeier",
@@ -20,29 +11,39 @@
       "url": "https://github.com/framefactory"
     }
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/framefactory/frontend-template/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/framefactory/webgpu-lab.git"
   },
-  "homepage": "https://github.com/framefactory/frontend-template#readme",
+  "bugs": {
+    "url": "https://github.com/framefactory/webgpu-lab/issues"
+  },
+  "type": "module",
+  "packageManager": "pnpm@7.13.3",
+  "scripts": {
+    "build": "pnpm run build:prod",
+    "build:dev": "cd src; NODE_ENV=development webpack --mode=development --env component=all",
+    "build:prod": "cd src; NODE_ENV=production webpack --mode=production --env component=all",
+    "dev": "cd src; NODE_ENV=development webpack serve --mode=development --env component=default"
+  },
   "dependencies": {
-    "@framefactory/browser": "file:libs/browser",
-    "@framefactory/core": "file:libs/core",
-    "@framefactory/lit": "file:libs/lit",
-    "@framefactory/ui": "file:libs/ui",
-    "@framefactory/geo": "file:libs/geo",
-    "@framefactory/gpu": "file:libs/gpu",
-    "lit": "^2.3.1"
+    "@ffweb/browser": "workspace:*",
+    "@ffweb/core": "workspace:*",
+    "@ffweb/geo": "workspace:*",
+    "@ffweb/gpu": "workspace:*",
+    "@ffweb/lit": "workspace:*",
+    "@ffweb/ui": "workspace:*",
+    "lit": "^2.4.0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.37.0",
-    "@typescript-eslint/parser": "^5.37.0",
-    "@webgpu/types": "^0.1.21",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "@webgpu/types": "^0.1.23",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
-    "css-minimizer-webpack-plugin": "^4.1.0",
-    "dotenv": "^16.0.2",
-    "eslint": "^8.23.1",
+    "css-minimizer-webpack-plugin": "^4.2.2",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
@@ -55,14 +56,14 @@
     "prettier": "^2.7.1",
     "raw-loader": "^4.0.2",
     "rimraf": "^3.0.2",
-    "sass-loader": "^13.0.2",
-    "source-map-loader": "^4.0.0",
+    "sass-loader": "^13.1.0",
+    "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.6",
-    "ts-loader": "^9.3.1",
-    "typescript": "^4.8.3",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.8.4",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.11.0"
+    "webpack-dev-server": "^4.11.1"
   }
 }

@@ -5,13 +5,13 @@
  * License: MIT
  */
 
-import { CustomElement, customElement, html, css } from "@ff/lit/CustomElement";
-import { fullsize } from "@ff/lit/styles/utils";
+import { CustomElement, customElement, html, css } from "@ffweb/lit/CustomElement.js";
+import { fullsize } from "@ffweb/lit/styles/snippets.js";
 
-import "@ff/lit/Canvas";
-import type { ICanvasMountEvent, ICanvasResizeEvent } from "@ff/lit/Canvas";
+import "@ffweb/lit/Canvas";
+import type { ICanvasMountEvent, ICanvasResizeEvent } from "@ffweb/lit/Canvas.js";
 
-import { Engine } from "../core/Engine";
+import { Engine } from "../core/Engine.js";
 
 @customElement("ff-application")
 export default class Application extends CustomElement

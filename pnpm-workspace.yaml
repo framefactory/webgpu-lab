@@ -1,0 +1,7 @@
+packages:
+  - "libs/browser"
+  - "libs/core"
+  - "libs/geo"
+  - "libs/gpu"
+  - "libs/lit"
+  - "libs/ui"
