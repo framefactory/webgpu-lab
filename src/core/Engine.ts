@@ -6,13 +6,13 @@
  */
 
 import { Pulse, type IPulseState } from "@ffweb/browser/Pulse.js";
+import { GPUSurface } from "@ffweb/gpu/GPUSurface.js";
 import { Experiment } from "./Experiment.js";
-import { Surface } from "./Surface.js";
 
 export class Engine
 {
     pulse: Pulse;
-    surface: Surface;
+    surface: GPUSurface;
     device: GPUDevice;
 
     private _experiment: Experiment = null;
@@ -25,19 +25,14 @@ export class Engine
         this.pulse.on("pulse", this.render, this);
     }
 
-    set experiment(experiment: Experiment) {
+    async setExperiment(experiment: Experiment) {
         this._experiment = experiment;
-        experiment.initialize(this.surface);
-    }
-
-    get experiment(): Experiment {
-        return this._experiment;
+        await experiment.initialize(this.surface);
     }
 
     set canvas(canvas: HTMLCanvasElement) {
         if (canvas) {
-            this.surface = new Surface(canvas);
-            this.surface.configure(this.device);    
+            this.surface = new GPUSurface(this.device, canvas);
         }
         else {
             this.surface.destroy();
@@ -77,7 +72,7 @@ export class Engine
     {
         if (this._resizeWidth > 0 && this._resizeHeight > 0) {
             this.surface.resize(this._resizeWidth, this._resizeHeight);
-            this.experiment?.resize(this._resizeWidth, this._resizeHeight);
+            this._experiment?.resize(this.surface);
             this._resizeWidth = 0;
             this._resizeHeight = 0;
         }

@@ -5,55 +5,98 @@
  * License: MIT
  */
 
-import { Experiment, Surface, type IPulseState } from "../core/Experiment.js";
+import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
+import shaderSource from "./triangle.wgsl";
 
 export class Triangle extends Experiment
 {
-    protected static vertexShaderCode = /* wgsl */`
-        @vertex
+    protected static vertices = new Float32Array([
+         0.0,  0.5, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0, 0.0,
+        -0.5, -0.5, 0.0,  0.0, 0.0, 1.0,  0.0, 1.0, 0.0,
+         0.5, -0.5, 0.0,  0.0, 0.0, 1.0,  0.0, 0.0, 1.0,
+    ]);
 
-        fn main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32>
-        {
-            var pos = array<vec2<f32>, 3>(
-                vec2<f32>(0.0, 0.5),
-                vec2<f32>(-0.5, -0.5),
-                vec2<f32>(0.5, -0.5)
-            );
-            return vec4<f32>(pos[vertexIndex], 0.0, 1.0);
-        }
-    `;
-
-    protected static fragmentShaderCode = /* wgsl */`
-        @fragment
-
-        fn main() -> @location(0) vec4<f32>
-        {
-            return vec4<f32>(1.0, 0.50, 0.0, 1.0);
-        }
-    `;
+    protected static indices = new Uint32Array([
+        0, 1, 2
+    ]);
 
     protected pipeline: GPURenderPipeline;
+    protected vertexBuffer: GPUBuffer;
+    protected indexBuffer: GPUBuffer;
+    protected bindGroupLayout: GPUBindGroupLayout;
 
-    initialize(surface: Surface)
+    async initialize(surface: GPUSurface)
     {
+        this.vertexBuffer = this.device.createBuffer({
+            size: Triangle.vertices.byteLength,
+            usage: GPUBufferUsage.VERTEX,
+            mappedAtCreation: true
+        });
+
+        const vb = new Float32Array(this.vertexBuffer.getMappedRange());
+        vb.set(Triangle.vertices);
+        this.vertexBuffer.unmap();
+
+        this.indexBuffer = this.device.createBuffer({
+            size: Triangle.indices.byteLength,
+            usage: GPUBufferUsage.INDEX,
+            mappedAtCreation: true
+        });
+
+        const ib = new Uint32Array(this.indexBuffer.getMappedRange());
+        ib.set(Triangle.indices);
+        this.indexBuffer.unmap();
+        
         const vertexShader = this.device.createShaderModule({
-            code: Triangle.vertexShaderCode,
+            code: shaderSource,
         });
         const fragmentShader = this.device.createShaderModule({
-            code: Triangle.fragmentShaderCode,
+            code: shaderSource,
+        });
+
+        // this.bindGroupLayout = this.device.createBindGroupLayout({
+        //     entries: [{
+        //         binding: 0,
+        //         visibility: GPUShaderStage.VERTEX,
+        //         buffer: {},
+        //     }, {
+        //         binding: 1,
+        //         visibility: GPUShaderStage.VERTEX,
+        //         buffer: {},
+        //     }],
+        // });
+
+        const pipelineLayout = this.device.createPipelineLayout({
+            bindGroupLayouts: []
         });
     
         this.pipeline = this.device.createRenderPipeline({
-            layout: "auto",
+            layout: pipelineLayout,
             vertex: {
                 module: vertexShader,
-                entryPoint: "main"
+                entryPoint: "vsMain",
+                buffers: [{
+                    arrayStride: 9 * 4,
+                    attributes: [{
+                        shaderLocation: 0,
+                        offset: 0,
+                        format: "float32x3",
+                    }, {
+                        shaderLocation: 1,
+                        offset: 3 * 4,
+                        format: "float32x3",
+                    }, {
+                        shaderLocation: 2,
+                        offset: 6 * 4,
+                        format: "float32x3"
+                    }],
+                }],
             },
             fragment: {
                 module: fragmentShader,
-                entryPoint: "main",
+                entryPoint: "fsMain",
                 targets: [{
-                    format: surface.presentationFormat
+                    format: surface.format
                 }]
             },
             primitive: {
@@ -62,12 +105,23 @@ export class Triangle extends Experiment
         });
     }
 
-    render(surface: Surface, state: IPulseState)
+    render(surface: GPUSurface, state: IPulseState)
     {
         const encoder = this.device.createCommandEncoder();
 
         const texture = surface.context.getCurrentTexture();
         const view = texture.createView();
+
+        // const bindGroup = this.device.createBindGroup({
+        //     layout: this.bindGroupLayout,
+        //     entries: [{
+        //         binding: 0,
+        //         resource: { buffer: this.vertexBuffer }
+        //     }, {
+        //         binding: 1,
+        //         resource: { buffer: this.indexBuffer }
+        //     }]
+        // });
 
         const pass = encoder.beginRenderPass({
             colorAttachments: [{
@@ -77,6 +131,9 @@ export class Triangle extends Experiment
                 storeOp: "store"
             }],
         });
+        pass.setVertexBuffer(0, this.vertexBuffer);
+        pass.setIndexBuffer(this.indexBuffer, "uint32");
+        //pass.setBindGroup(0, bindGroup);
         pass.setPipeline(this.pipeline);
         pass.draw(3, 1, 0, 0);
         pass.end();

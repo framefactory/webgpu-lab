@@ -1,6 +1,6 @@
 /**
  * Webpack configuration utilities
- * Version 4.0
+ * Version 4.1
  *
  * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  * License: MIT
@@ -161,7 +161,7 @@
          resolve: {
              modules: settings.folders.modules,
              alias: settings.aliases,
-             extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".wasm" ],
+             extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".wasm", "wgsl" ],
              extensionAlias: {
                  '.js': ['.js', '.ts'],
                  '.mjs': ['.mjs', '.mts'],
@@ -218,7 +218,7 @@
                  },
                  {
                      // Raw text and shader files
-                     test: /\.(txt|glsl|hlsl|frag|vert|fs|vs)$/,
+                     test: /\.(txt|wgsl|glsl|hlsl|frag|vert|fs|vs)$/,
                      type: "asset/source"
                  },
                  {

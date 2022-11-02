@@ -11,8 +11,11 @@ import { fullsize } from "@ffweb/lit/styles/snippets.js";
 import "@ffweb/lit/Canvas";
 import type { ICanvasMountEvent, ICanvasResizeEvent } from "@ffweb/lit/Canvas.js";
 
+import { BufferLayout } from "@ffweb/geo/BufferLayout.js"
+
 import { Engine } from "../core/Engine.js";
 import { Triangle } from "../experiments/Triangle.js";
+import { Plane } from "../experiments/Plane.js"
 
 @customElement("ff-application")
 export default class Application extends CustomElement
@@ -57,7 +60,7 @@ export default class Application extends CustomElement
         this.engine.canvas = canvas;
 
         if (canvas) {
-            this.engine.experiment = new Triangle(this.engine.device);
+            await this.engine.setExperiment(new Plane(this.engine.device));
             this.engine.start();    
         }
         else {

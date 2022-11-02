@@ -6,10 +6,9 @@
  */
 
 import { type IPulseState  } from "@ffweb/browser/Pulse.js";
+import { GPUSurface } from "@ffweb/gpu/GPUSurface.js";
 
-import { Surface } from "../core/Surface.js";
-
-export { Surface, IPulseState };
+export { GPUSurface, IPulseState };
 
 /**
  * Base class for a WebGPU experiment
@@ -23,15 +22,15 @@ export class Experiment
         this.device = device;
     }
 
-    initialize(surface: Surface)
+    async initialize(surface: GPUSurface)
     {
     }
 
-    render(surface: Surface, state: IPulseState)
+    render(surface: GPUSurface, state: IPulseState)
     {
     }
 
-    resize(width: number, height: number)
+    resize(surface: GPUSurface)
     {
     }
 }
