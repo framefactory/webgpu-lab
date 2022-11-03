@@ -28,7 +28,7 @@ export default utils.createWebpackConfig({
         source: path.resolve(projectDir, "src"),
         // built code
         output: path.resolve(projectDir, "public/built"),
-        // assets: path.resolve(projectDir, "assets"),
+        assets: path.resolve(projectDir, "assets"),
         static: path.resolve(projectDir, "public/static"),
         modules: [ "node_modules" ],
         jsFolder: "", // "js/",

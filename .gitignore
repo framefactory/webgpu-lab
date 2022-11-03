@@ -5,7 +5,8 @@
 node_modules/
 
 doc/
-public/built/
+public/
+assets/
 
 # FILES
 .env

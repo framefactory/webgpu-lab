@@ -30,6 +30,10 @@ export class Engine
         await experiment.initialize(this.surface);
     }
 
+    get experiment(): Experiment | null {
+        return this._experiment;
+    }
+
     set canvas(canvas: HTMLCanvasElement) {
         if (canvas) {
             this.surface = new GPUSurface(this.device, canvas);

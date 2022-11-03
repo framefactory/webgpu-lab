@@ -5,17 +5,28 @@
  * License: MIT
  */
 
+import { mat4 } from "gl-matrix";
+
+import { math } from "@ffweb/core/math.js";
 import { Plane as PlaneGeometry } from "@ffweb/geo/Plane.js";
+import { Box as BoxGeometry } from "@ffweb/geo/Box.js";
+import { Torus as TorusGeometry } from "@ffweb/geo/Torus.js";
 import { GPUGeometry } from "@ffweb/gpu/GPUGeometry.js";
+import { GPUTransform } from "@ffweb/gpu/GPUTransform.js"
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
 import shaderSource from "./plane.wgsl";
+
+
+const _idMatrix = mat4.create();
 
 export class Plane extends Experiment
 {
     protected planeGeometry: GPUGeometry;
     protected pipeline: GPURenderPipeline;
+    protected renderPassDesc: GPURenderPassDescriptor;
     protected depthTexture: GPUTexture;
+    protected transform: GPUTransform;
 
     async initialize(surface: GPUSurface)
     {
@@ -27,32 +38,36 @@ export class Plane extends Experiment
             usage: GPUTextureUsage.RENDER_ATTACHMENT
         });
 
-        const geo = new PlaneGeometry({ tesselation: [10, 10] });
+        //const geo = new PlaneGeometry({ size: [5, 5], tesselation: [1, 1] });
+        //const geo = new BoxGeometry({ size: [5, 5, 5], tesselation: [1, 1, 1] });
+        const geo = new TorusGeometry({ radius: [ 2.5, 1.5 ] });
         this.planeGeometry = new GPUGeometry(device, geo);
         this.planeGeometry.update();
 
-        const vertexShader = device.createShaderModule({
+        const shader = device.createShaderModule({
             code: shaderSource,
         });
-        const fragmentShader = device.createShaderModule({
-            code: shaderSource,
-        });
+
+        const tf = this.transform = new GPUTransform(this.device);
+        mat4.translate(tf.viewMatrix, tf.viewMatrix, [ 0, 0, -10 ]);
 
         const pipelineLayout = device.createPipelineLayout({
-            bindGroupLayouts: []
+            bindGroupLayouts: [
+                this.transform.bindGroupLayout,
+            ],
         });
-
-        const vertexBufferLayout = this.planeGeometry.createVertexBufferLayout();
     
         this.pipeline = device.createRenderPipeline({
             layout: pipelineLayout,
             vertex: {
-                module: vertexShader,
+                module: shader,
                 entryPoint: "vsMain",
-                buffers: [ vertexBufferLayout ],
+                buffers: [ 
+                    this.planeGeometry.vertexBufferLayout,
+                 ],
             },
             fragment: {
-                module: fragmentShader,
+                module: shader,
                 entryPoint: "fsMain",
                 targets: [{
                     format: surface.format
@@ -60,7 +75,7 @@ export class Plane extends Experiment
             },
             primitive: {
                 topology: this.planeGeometry.topology,
-                cullMode: "none",
+                cullMode: "back",
             },
             depthStencil: {
                 depthWriteEnabled: true,
@@ -68,32 +83,40 @@ export class Plane extends Experiment
                 format: "depth24plus",
             },
         });
-    }
 
-    render(surface: GPUSurface, state: IPulseState)
-    {
-        this.planeGeometry.update();
-        const encoder = this.device.createCommandEncoder();
-
-        const texture = surface.context.getCurrentTexture();
-
-        const pass = encoder.beginRenderPass({
+        this.renderPassDesc = {
             colorAttachments: [{
-                view: texture.createView(),
+                view: null,
                 clearValue: { r: 0, g: 0, b: 0, a: 1 },
                 loadOp: "clear",
                 storeOp: "store"
             }],
             depthStencilAttachment: {
-                view: this.depthTexture.createView(),
+                view: null,
                 depthClearValue: 1.0,
                 depthLoadOp: "clear",
                 depthStoreOp: "store"
             }
-        });
+        };
+    }
 
+    render(surface: GPUSurface, state: IPulseState)
+    {
+        //this.planeGeometry.update();
+
+        mat4.rotateY(this.transform.modelMatrix, _idMatrix, math.deg2rad(state.seconds * 3));
+        mat4.rotateX(this.transform.modelMatrix, this.transform.modelMatrix, math.deg2rad(state.seconds * 30));
+        this.transform.update();
+
+        const encoder = this.device.createCommandEncoder();
+
+        const texture = surface.context.getCurrentTexture();
+        this.renderPassDesc.colorAttachments[0].view = texture.createView();
+        this.renderPassDesc.depthStencilAttachment.view = this.depthTexture.createView();
+
+        const pass = encoder.beginRenderPass(this.renderPassDesc);
         pass.setPipeline(this.pipeline);
-        //pass.setBindGroup(0, bindGroup);
+        pass.setBindGroup(0, this.transform.bindGroup);
         this.planeGeometry.setBuffers(pass);
         this.planeGeometry.draw(pass);
         pass.end();
@@ -112,5 +135,10 @@ export class Plane extends Experiment
             format: "depth24plus",
             usage: GPUTextureUsage.RENDER_ATTACHMENT
         });
+
+        const aspect = surface.size.width / surface.size.height;
+        mat4.perspective(this.transform.projectionMatrix,
+            math.deg2rad(50), aspect, 0.1, 1000);
+
     }
 }

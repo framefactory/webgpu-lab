@@ -141,7 +141,7 @@ export class Triangle extends Experiment
         this.device.queue.submit([ encoder.finish() ]);
     }
 
-    resize(width: number, height: number)
+    resize(surface: GPUSurface)
     {
     }
 }

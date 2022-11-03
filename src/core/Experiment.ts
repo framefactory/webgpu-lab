@@ -5,6 +5,7 @@
  * License: MIT
  */
 
+import { IPointerEvent, ITriggerEvent } from "@ffweb/browser/ManipTarget.js";
 import { type IPulseState  } from "@ffweb/browser/Pulse.js";
 import { GPUSurface } from "@ffweb/gpu/GPUSurface.js";
 
@@ -32,5 +33,15 @@ export class Experiment
 
     resize(surface: GPUSurface)
     {
+    }
+
+    onPointer(event: IPointerEvent): boolean
+    {
+        return false;
+    }
+
+    onTrigger(event: ITriggerEvent): boolean
+    {
+        return false;
     }
 }
