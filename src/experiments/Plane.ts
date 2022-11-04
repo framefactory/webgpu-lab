@@ -63,7 +63,7 @@ export class Plane extends Experiment
                 module: shader,
                 entryPoint: "vsMain",
                 buffers: [ 
-                    this.planeGeometry.vertexBufferLayout,
+                    this.planeGeometry.createVertexBufferLayout(),
                  ],
             },
             fragment: {

@@ -13,7 +13,8 @@ import { Plane as PlaneGeometry } from "@ffweb/geo/Plane.js";
 import { Box as BoxGeometry } from "@ffweb/geo/Box.js";
 import { Torus as TorusGeometry } from "@ffweb/geo/Torus.js";
 import { GPUGeometry } from "@ffweb/gpu/GPUGeometry.js";
-import { GPUTransform } from "@ffweb/gpu/GPUTransform.js"
+import { GPUTransform } from "@ffweb/gpu/GPUTransform.js";
+import { TextureLoader } from "@ffweb/gpu/TextureLoader.js";
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
 import shaderSource from "./plane.wgsl";
@@ -62,18 +63,8 @@ export class TextureMSAA extends Experiment
         this.planeGeometry = new GPUGeometry(device, geo);
         this.planeGeometry.update();
 
-        const image = document.createElement("img");
-        image.src = "test-tiles-1024c.png";
-        await image.decode();
-        const bitmap = await createImageBitmap(image);
-
-        this.imageTexture = device.createTexture({
-            size: [ bitmap.width, bitmap.height, 1 ],
-            format: "rgba8unorm",
-            usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        device.queue.copyExternalImageToTexture(
-            { source: bitmap }, { texture: this.imageTexture }, [ bitmap.width, bitmap.height ]);
+        const loader = new TextureLoader(device);
+        this.imageTexture = await loader.fetchTextureFromImageUrl("test-tiles-1024b.png");
 
         const imageSampler = device.createSampler({
             magFilter: "linear",
@@ -123,7 +114,7 @@ export class TextureMSAA extends Experiment
                 module: shader,
                 entryPoint: "vsMain",
                 buffers: [ 
-                    this.planeGeometry.vertexBufferLayout,
+                    this.planeGeometry.createVertexBufferLayout(),
                 ],
             },
             fragment: {

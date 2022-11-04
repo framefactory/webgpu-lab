@@ -39,6 +39,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
+    "@types/offscreencanvas": "^2019.7.0",
     "@webgpu/types": "^0.1.23",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",

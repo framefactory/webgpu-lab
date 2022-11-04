@@ -10,6 +10,7 @@ importers:
       '@ffweb/gpu': workspace:*
       '@ffweb/lit': workspace:*
       '@ffweb/ui': workspace:*
+      '@types/offscreencanvas': ^2019.7.0
       '@typescript-eslint/eslint-plugin': ^5.42.0
       '@typescript-eslint/parser': ^5.42.0
       '@webgpu/types': ^0.1.23
@@ -51,6 +52,7 @@ importers:
       gl-matrix: 3.4.3
       lit: 2.4.0
     devDependencies:
+      '@types/offscreencanvas': 2019.7.0
       '@typescript-eslint/eslint-plugin': 5.42.0_6xw5wg2354iw4zujk2f3vyfrzu
       '@typescript-eslint/parser': 5.42.0_wyqvi574yv7oiwfeinomdzmc3m
       '@webgpu/types': 0.1.23
@@ -137,6 +139,7 @@ importers:
       '@ffweb/geo': workspace:*
       '@types/chai': ^4.3.3
       '@types/mocha': ^9.1.1
+      '@types/offscreencanvas': ^2019.7.0
       '@webgpu/types': ^0.1.23
       chai: ^4.3.6
       mocha: ^10.1.0
@@ -147,6 +150,7 @@ importers:
     devDependencies:
       '@types/chai': 4.3.3
       '@types/mocha': 9.1.1
+      '@types/offscreencanvas': 2019.7.0
       '@webgpu/types': 0.1.23
       chai: 4.3.6
       mocha: 10.1.0
@@ -486,6 +490,10 @@ packages:
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
+    dev: true
+
+  /@types/offscreencanvas/2019.7.0:
+    resolution: {integrity: sha512-PGcyveRIpL1XIqK8eBsmRBt76eFgtzuPiSTyKHZxnGemp2yzGzWpjYKAfK3wIMiU7eH+851yEpiuP8JZerTmWg==}
     dev: true
 
   /@types/parse-json/4.0.0:

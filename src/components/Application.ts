@@ -19,6 +19,7 @@ import { Engine } from "../core/Engine.js";
 import { Triangle } from "../experiments/Triangle.js";
 import { Plane } from "../experiments/Plane.js"
 import { TextureMSAA } from "../experiments/TextureMSAA.js";
+import { Compute } from "../experiments/Compute.js";
 
 @customElement("ff-application")
 export default class Application extends CustomElement
@@ -67,7 +68,7 @@ export default class Application extends CustomElement
 
         if (canvas) {
             this.manipTarget.element = canvas;
-            await this.engine.setExperiment(new TextureMSAA(this.engine.device));
+            await this.engine.setExperiment(new Compute(this.engine.device));
             this.engine.start();    
         }
         else {
