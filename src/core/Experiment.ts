@@ -7,9 +7,9 @@
 
 import { IPointerEvent, ITriggerEvent } from "@ffweb/browser/ManipTarget.js";
 import { type IPulseState  } from "@ffweb/browser/Pulse.js";
-import { GPUSurface } from "@ffweb/gpu/GPUSurface.js";
+import { Surface } from "@ffweb/gpu/Surface.js";
 
-export { GPUSurface, IPulseState };
+export { Surface as GPUSurface, IPulseState };
 
 /**
  * Base class for a WebGPU experiment
@@ -23,15 +23,15 @@ export class Experiment
         this.device = device;
     }
 
-    async initialize(surface: GPUSurface)
+    async initialize(surface: Surface)
     {
     }
 
-    render(surface: GPUSurface, state: IPulseState)
+    render(surface: Surface, state: IPulseState)
     {
     }
 
-    resize(surface: GPUSurface)
+    resize(surface: Surface)
     {
     }
 

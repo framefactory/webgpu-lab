@@ -6,13 +6,13 @@
  */
 
 import { Pulse, type IPulseState } from "@ffweb/browser/Pulse.js";
-import { GPUSurface } from "@ffweb/gpu/GPUSurface.js";
+import { Surface } from "@ffweb/gpu/Surface.js";
 import { Experiment } from "./Experiment.js";
 
 export class Engine
 {
     pulse: Pulse;
-    surface: GPUSurface;
+    surface: Surface;
     device: GPUDevice;
 
     private _experiment: Experiment = null;
@@ -36,7 +36,7 @@ export class Engine
 
     set canvas(canvas: HTMLCanvasElement) {
         if (canvas) {
-            this.surface = new GPUSurface(this.device, canvas);
+            this.surface = new Surface(this.device, canvas);
         }
         else {
             this.surface.destroy();

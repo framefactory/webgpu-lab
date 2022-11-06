@@ -12,12 +12,16 @@ import { OrbitManipulator, IPointerEvent, ITriggerEvent } from "@ffweb/browser/O
 import { Plane as PlaneGeometry } from "@ffweb/geo/Plane.js";
 import { Box as BoxGeometry } from "@ffweb/geo/Box.js";
 import { Torus as TorusGeometry } from "@ffweb/geo/Torus.js";
-import { GPUGeometry } from "@ffweb/gpu/GPUGeometry.js";
+
+import { GeometryBuffer } from "@ffweb/gpu/GeometryBuffer.js";
 import { GPUTransform } from "@ffweb/gpu/GPUTransform.js";
 import { TextureLoader } from "@ffweb/gpu/TextureLoader.js";
+import { MipmapGenerator } from "@ffweb/gpu/MipmapGenerator.js";
+import { GaussianBlur } from "@ffweb/gpu/GaussianBlur.js";
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
-import shaderSource from "./plane.wgsl";
+
+import shaderSource from "../shader/plane.wgsl";
 
 
 const _idMatrix = mat4.create();
@@ -26,7 +30,7 @@ export class TextureMSAA extends Experiment
 {
     protected manip: OrbitManipulator;
 
-    protected planeGeometry: GPUGeometry;
+    protected planeGeometry: GeometryBuffer;
     protected pipeline: GPURenderPipeline;
     protected renderPassDesc: GPURenderPassDescriptor;
     protected colorTexture: GPUTexture;
@@ -60,15 +64,22 @@ export class TextureMSAA extends Experiment
         //const geo = new PlaneGeometry({ size: [5, 5], tesselation: [50, 50] });
         //const geo = new BoxGeometry({ size: [5, 5, 5], tesselation: [10, 5, 3] });
         const geo = new TorusGeometry({ radius: [ 2.5, 1.5 ] });
-        this.planeGeometry = new GPUGeometry(device, geo);
+        this.planeGeometry = new GeometryBuffer(device, geo);
         this.planeGeometry.update();
 
         const loader = new TextureLoader(device);
-        this.imageTexture = await loader.fetchTextureFromImageUrl("test-tiles-1024b.png");
+        const mipGen = new MipmapGenerator(device);
+        const blurGen = new GaussianBlur(device);
+        this.imageTexture = await loader.fetchTextureFromImageUrl("test-tiles-1024c.png");
+        //mipGen.generateMipmap(this.imageTexture);
+        this.imageTexture = blurGen.apply(this.imageTexture, null, 30, 30);
+
 
         const imageSampler = device.createSampler({
             magFilter: "linear",
-            minFilter: "linear"
+            minFilter: "linear",
+            mipmapFilter: "linear",
+            maxAnisotropy: 16,
         });
 
         this.textureBindGroupLayout = device.createBindGroupLayout({

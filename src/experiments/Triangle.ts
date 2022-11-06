@@ -6,7 +6,9 @@
  */
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
-import shaderSource from "./triangle.wgsl";
+
+import shaderSource from "../shader/triangle.wgsl";
+
 
 export class Triangle extends Experiment
 {

@@ -8,8 +8,9 @@
 import { TextureLoader } from "@ffweb/gpu/TextureLoader.js";
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
-import computeCode from "./compute_test.wgsl";
-import renderCode from "./unit_rect.wgsl";
+
+import computeCode from "../shader/compute_test.wgsl";
+import renderCode from "../shader/unit_rect.wgsl";
 
 export class Compute extends Experiment
 {

@@ -68,7 +68,7 @@ export default class Application extends CustomElement
 
         if (canvas) {
             this.manipTarget.element = canvas;
-            await this.engine.setExperiment(new Compute(this.engine.device));
+            await this.engine.setExperiment(new TextureMSAA(this.engine.device));
             this.engine.start();    
         }
         else {

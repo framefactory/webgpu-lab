@@ -11,18 +11,19 @@ import { math } from "@ffweb/core/math.js";
 import { Plane as PlaneGeometry } from "@ffweb/geo/Plane.js";
 import { Box as BoxGeometry } from "@ffweb/geo/Box.js";
 import { Torus as TorusGeometry } from "@ffweb/geo/Torus.js";
-import { GPUGeometry } from "@ffweb/gpu/GPUGeometry.js";
+import { GeometryBuffer } from "@ffweb/gpu/GeometryBuffer.js";
 import { GPUTransform } from "@ffweb/gpu/GPUTransform.js"
 
 import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
-import shaderSource from "./plane.wgsl";
+
+import shaderSource from "../shader/plane.wgsl";
 
 
 const _idMatrix = mat4.create();
 
 export class Plane extends Experiment
 {
-    protected planeGeometry: GPUGeometry;
+    protected planeGeometry: GeometryBuffer;
     protected pipeline: GPURenderPipeline;
     protected renderPassDesc: GPURenderPassDescriptor;
     protected depthTexture: GPUTexture;
@@ -41,7 +42,7 @@ export class Plane extends Experiment
         //const geo = new PlaneGeometry({ size: [5, 5], tesselation: [1, 1] });
         //const geo = new BoxGeometry({ size: [5, 5, 5], tesselation: [1, 1, 1] });
         const geo = new TorusGeometry({ radius: [ 2.5, 1.5 ] });
-        this.planeGeometry = new GPUGeometry(device, geo);
+        this.planeGeometry = new GeometryBuffer(device, geo);
         this.planeGeometry.update();
 
         const shader = device.createShaderModule({
