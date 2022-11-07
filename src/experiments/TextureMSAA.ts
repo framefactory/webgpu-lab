@@ -19,7 +19,7 @@ import { TextureLoader } from "@ffweb/gpu/TextureLoader.js";
 import { MipmapGenerator } from "@ffweb/gpu/MipmapGenerator.js";
 import { GaussianBlur } from "@ffweb/gpu/GaussianBlur.js";
 
-import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
+import { Experiment, Surface, Pane, type IPulseState } from "../core/Experiment.js";
 
 import shaderSource from "../shader/plane.wgsl";
 
@@ -28,6 +28,9 @@ const _idMatrix = mat4.create();
 
 export class TextureMSAA extends Experiment
 {
+    horzBlur = 0;
+    vertBlur = 0;
+
     protected manip: OrbitManipulator;
 
     protected planeGeometry: GeometryBuffer;
@@ -37,11 +40,19 @@ export class TextureMSAA extends Experiment
     protected depthTexture: GPUTexture;
     protected transform: GPUTransform;
 
+    protected blurGenerator: GaussianBlur;
+    protected blurTexture: GPUTexture;
     protected imageTexture: GPUTexture;
     protected textureBindGroupLayout: GPUBindGroupLayout;
     protected textureBindGroup: GPUBindGroup;
 
-    async initialize(surface: GPUSurface)
+    createUI(pane: Pane)
+    {
+        pane.addInput(this, "horzBlur", { label: "Horizontal Blur", min: 0, max: 50, step: 0.01 });
+        pane.addInput(this, "vertBlur", { label: "Vertical Blur", min: 0, max: 50, step: 0.01 });
+    }
+
+    async initialize(surface: Surface)
     {
         this.manip = new OrbitManipulator();
         this.manip.offset[2] = 10;
@@ -69,11 +80,17 @@ export class TextureMSAA extends Experiment
 
         const loader = new TextureLoader(device);
         const mipGen = new MipmapGenerator(device);
-        const blurGen = new GaussianBlur(device);
-        this.imageTexture = await loader.fetchTextureFromImageUrl("test-tiles-1024c.png");
-        //mipGen.generateMipmap(this.imageTexture);
-        this.imageTexture = blurGen.apply(this.imageTexture, null, 30, 30);
+        this.blurGenerator = new GaussianBlur(device);
 
+        this.imageTexture = await loader.fetchTextureFromImageUrl("test-tiles-1024c.png");
+        this.blurTexture = device.createTexture({
+            size: [ this.imageTexture.width, this.imageTexture.height, 1 ],
+            format: this.imageTexture.format,
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING
+        });
+
+        //mipGen.generateMipmap(this.imageTexture);
+        
 
         const imageSampler = device.createSampler({
             magFilter: "linear",
@@ -101,7 +118,7 @@ export class TextureMSAA extends Experiment
                 resource: imageSampler,
             }, {
                 binding: 1,
-                resource: this.imageTexture.createView(),
+                resource: this.blurTexture.createView(),
             }],
         });
 
@@ -166,7 +183,7 @@ export class TextureMSAA extends Experiment
         };
     }
 
-    render(surface: GPUSurface, state: IPulseState)
+    render(surface: Surface, state: IPulseState)
     {
         this.manip.viewportHeight = surface.size.height;
 
@@ -181,13 +198,14 @@ export class TextureMSAA extends Experiment
             mat4.rotateZ(matView, matView, math.deg2rad(-orbit[2]));
         }
 
-        //mat4.rotateY(this.transform.modelMatrix, _idMatrix, math.deg2rad(state.seconds * 3));
-        //mat4.rotateX(this.transform.modelMatrix, this.transform.modelMatrix, math.deg2rad(state.seconds * 30));
+        this.blurGenerator.apply(this.imageTexture, this.blurTexture,
+            this.horzBlur, this.vertBlur);
+
         this.transform.update();
 
         const encoder = this.device.createCommandEncoder();
 
-        const textureView = surface.context.getCurrentTexture().createView();
+        const textureView = surface.getCurrentTextureView();
         this.renderPassDesc.colorAttachments[0].resolveTarget = textureView;
 
         const pass = encoder.beginRenderPass(this.renderPassDesc);
@@ -201,7 +219,7 @@ export class TextureMSAA extends Experiment
         this.device.queue.submit([ encoder.finish() ]);
     }
 
-    resize(surface: GPUSurface)
+    resize(surface: Surface)
     {
         if (this.colorTexture) {
             this.colorTexture.destroy();

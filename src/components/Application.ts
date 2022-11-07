@@ -5,6 +5,8 @@
  * License: MIT
  */
 
+import { Pane } from "tweakpane";
+
 import { ManipTarget, IPointerEvent, ITriggerEvent } from "@ffweb/browser/ManipTarget.js";
 
 import { CustomElement, customElement, html, css } from "@ffweb/lit/CustomElement.js";
@@ -16,10 +18,12 @@ import type { ICanvasMountEvent, ICanvasResizeEvent } from "@ffweb/lit/Canvas.js
 import { BufferLayout } from "@ffweb/geo/BufferLayout.js"
 
 import { Engine } from "../core/Engine.js";
+import { Experiment } from "../core/Experiment.js";
+
 import { Triangle } from "../experiments/Triangle.js";
 import { Plane } from "../experiments/Plane.js"
 import { TextureMSAA } from "../experiments/TextureMSAA.js";
-import { Compute } from "../experiments/Compute.js";
+import { NoiseGenerator  } from "../experiments/NoiseGenerator.js";
 
 @customElement("ff-application")
 export default class Application extends CustomElement
@@ -28,6 +32,7 @@ export default class Application extends CustomElement
 
     protected engine: Engine;
     protected manipTarget: ManipTarget;
+    protected pane: Pane;
 
     static styles = css`
         :host {
@@ -47,6 +52,7 @@ export default class Application extends CustomElement
         this.engine = new Engine();
         this.manipTarget = new ManipTarget();
         this.manipTarget.listener = this;
+        this.pane = new Pane({ title: "Controls" });
     }
 
     render()
@@ -68,7 +74,9 @@ export default class Application extends CustomElement
 
         if (canvas) {
             this.manipTarget.element = canvas;
-            await this.engine.setExperiment(new TextureMSAA(this.engine.device));
+            const experiment = new NoiseGenerator(this.engine.device);
+            experiment.createUI(this.pane);
+            await this.engine.setExperiment(experiment);
             this.engine.start();    
         }
         else {

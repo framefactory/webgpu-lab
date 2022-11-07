@@ -86,7 +86,7 @@ export class Engine
 
     resize(width: number, height: number)
     {
-        this._resizeWidth = Math.floor(width);
-        this._resizeHeight = Math.floor(height);
+        this._resizeWidth = Math.round(width);
+        this._resizeHeight = Math.round(height);
     }
 }

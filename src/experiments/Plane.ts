@@ -14,7 +14,7 @@ import { Torus as TorusGeometry } from "@ffweb/geo/Torus.js";
 import { GeometryBuffer } from "@ffweb/gpu/GeometryBuffer.js";
 import { GPUTransform } from "@ffweb/gpu/GPUTransform.js"
 
-import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
+import { Experiment, Surface, type IPulseState } from "../core/Experiment.js";
 
 import shaderSource from "../shader/plane.wgsl";
 
@@ -29,7 +29,7 @@ export class Plane extends Experiment
     protected depthTexture: GPUTexture;
     protected transform: GPUTransform;
 
-    async initialize(surface: GPUSurface)
+    async initialize(surface: Surface)
     {
         const device = this.device;
 
@@ -101,7 +101,7 @@ export class Plane extends Experiment
         };
     }
 
-    render(surface: GPUSurface, state: IPulseState)
+    render(surface: Surface, state: IPulseState)
     {
         //this.planeGeometry.update();
 
@@ -125,7 +125,7 @@ export class Plane extends Experiment
         this.device.queue.submit([ encoder.finish() ]);
     }
 
-    resize(surface: GPUSurface)
+    resize(surface: Surface)
     {
         if (this.depthTexture) {
             this.depthTexture.destroy();

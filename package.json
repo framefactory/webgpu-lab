@@ -34,9 +34,11 @@
     "@ffweb/lit": "workspace:*",
     "@ffweb/ui": "workspace:*",
     "gl-matrix": "^3.4.3",
-    "lit": "^2.4.0"
+    "lit": "^2.4.0",
+    "tweakpane": "^3.1.0"
   },
   "devDependencies": {
+    "@tweakpane/core": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@types/offscreencanvas": "^2019.7.0",

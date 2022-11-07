@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { Experiment, GPUSurface, type IPulseState } from "../core/Experiment.js";
+import { Experiment, Surface, type IPulseState } from "../core/Experiment.js";
 
 import shaderSource from "../shader/triangle.wgsl";
 
@@ -27,7 +27,7 @@ export class Triangle extends Experiment
     protected indexBuffer: GPUBuffer;
     protected bindGroupLayout: GPUBindGroupLayout;
 
-    async initialize(surface: GPUSurface)
+    async initialize(surface: Surface)
     {
         this.vertexBuffer = this.device.createBuffer({
             size: Triangle.vertices.byteLength,
@@ -107,7 +107,7 @@ export class Triangle extends Experiment
         });
     }
 
-    render(surface: GPUSurface, state: IPulseState)
+    render(surface: Surface, state: IPulseState)
     {
         const encoder = this.device.createCommandEncoder();
 
@@ -143,7 +143,7 @@ export class Triangle extends Experiment
         this.device.queue.submit([ encoder.finish() ]);
     }
 
-    resize(surface: GPUSurface)
+    resize(surface: Surface)
     {
     }
 }
